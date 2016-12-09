@@ -47,11 +47,11 @@ echo:
 	@echo "SOURCES = $(SOURCES)"
 	@echo "OBJS = $(OBJS)"
 
-test:
-	make -C ../test/;
+#test:
+	#make -C ../test/;
 
 clean:
-	make -C ../test/ clean;
+	#make -C ../test/ clean;
 	rm -rf $(OBJS) 
 	rm -rf $(BIN_NAME)
 

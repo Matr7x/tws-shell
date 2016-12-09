@@ -1,6 +1,8 @@
 #include "client_socket.h"
 
 #include "message_builder.h"
+#include "decoder.h"
+#include "defines.h"
 
 #include <iostream>
 #include <sstream>
@@ -9,6 +11,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <sys/fcntl.h>
+#include <sys/select.h>
 
 using std::cout;
 using std::endl;
@@ -67,15 +70,15 @@ int ClientSocket::Select() {
   FD_ZERO(&error_set);
 
   FD_SET(this->sock_, &in_set);
-  FD_SET(this->sock_, $error_set);
+  FD_SET(this->sock_, &error_set);
 
-  int code  = ::select(this->sock_ + 1, &in_set, null, &error_set, &time_val);
+  int code  = ::select(this->sock_ + 1, &in_set, NULL, &error_set, &time_val);
 
   if (0 == code) {
     return 0;
   }
 
-  if (ret < 0) {
+  if (code < 0) {
     return 1;
   }
 
@@ -92,9 +95,15 @@ int ClientSocket::Select() {
 }
 
 int ClientSocket::Receive() {
+  // XXX: 接收代码待优化
   char buf[8192];
   memset(buf, sizeof(buf), 0);
-  int received = receive(this->sock_, buf, sizeof(buf), 0);
+  int received = ::recv(this->sock_, buf, sizeof(buf), 0);
+
+  // XXX: receive待优化
+  if (received < 0) {
+    return 255;
+  }
 
   int processed = 0;
 
@@ -114,7 +123,12 @@ int ClientSocket::Receive() {
       break;
   }
 
-  this->DecodeMessage()
+  this->DecodeMessage();
+  return 0;
+}
+
+int ClientSocket::DecodeMessage() {
+  return 0;
 }
 
 int ClientSocket::Connect() {
@@ -159,7 +173,12 @@ int ClientSocket::ProcessConnectionResponse() {
 int ClientSocket::StartApi() {
   ostringstream oss; 
   MessageBuilder::BuildMsgStartApi(oss);
-  /*int sent = */::send(sock_, oss.str().c_str(), oss.str().size(), 0);
+  int sent = ::send(sock_, oss.str().c_str(), oss.str().size(), 0);
+
+  // XXX: 待优化
+  if (sent < 0) {
+    return 255;
+  }
 
   //cout << "sent: " << sent << endl;
 

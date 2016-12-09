@@ -14,7 +14,7 @@ using tws_shell::ClientSocket;
 using tws_shell::Shell;
 
 int main(int argc, char* argv[]) {
-  // Config
+  // 配置
   string address = "127.0.0.1";
   int port = 4001;
 

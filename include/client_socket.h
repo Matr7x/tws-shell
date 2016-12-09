@@ -48,6 +48,9 @@ private:
   // 接收消息
   int Receive();
 
+  // 解码消息
+  int DecodeMessage();
+
 private:
   string  address_;
   int     port_;

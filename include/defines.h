@@ -6,6 +6,11 @@ const int   kClientId                     = 0;
 
 // OUTGOING MSG ID
 const int   kMsgIdStartApi                = 71;
+const int   kMsgIdReqContractData         = 9;
+const int   kMsgIdReqMktData              = 1;
+const int   kMsgIdReqAccountSummary       = 62;
+const int   kMsgIdReqPositions            = 61;
+const int   kMsgIdReqHistoricalData       = 20;
 
 // INCOMMING MSG ID
 const int TICK_PRICE                = 1;
@@ -51,5 +56,15 @@ const int VERIFY_MESSAGE_API        = 65;
 const int VERIFY_COMPLETED          = 66;
 const int DISPLAY_GROUP_LIST        = 67;
 const int DISPLAY_GROUP_UPDATED     = 68;
+
+#define DECODE(x) \
+  decoded = Decoder::Decode(&buf[processed], size - processed, x); \
+  if (decoded < 0) { \
+    return -1; \
+  } \
+  processed += decoded;
+
+#define ENCODE(x) \
+  Encoder::Encode(oss, x);
 
 #endif //TWS_DEFINES_SOCKET_H_

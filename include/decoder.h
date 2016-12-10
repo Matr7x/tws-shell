@@ -1,46 +1,29 @@
-#ifndef TWS_SHELL_ENCODER_H_
-#define TWS_SHELL_ENCODER_H_
+#ifndef TWS_SHELL_DECODER_H_
+#define TWS_SHELL_DECODER_H_
 
 #include <iostream>
+#include <string>
 
 using std::cout;
 using std::endl;
+using std::string;
 
 namespace tws_shell {
 
-template<class T>
 class Decoder {
 
 public:
-  static int Decode(char* ptr, int sieze, T& value);
+  static int Decode(char* ptr, int size, int& value);
+  static int Decode(char* ptr, int size, long& value);
+  static int Decode(char* ptr, int size, bool& value);
+  static int Decode(char* ptr, int size, double& value);
+  static int Decode(char* ptr, int size, string& value);
 
 private:
   static const char* FindZero(char*& ptr, int size);
 
 };
 
-template<>
-int Decoder<int>::Decode(char* ptr, int size, int& value) {
-  // 寻找zero
-  const char* zero_ptr = FindZero(ptr, size);
-
-  // 找不到zero的情况
-  if (NULL == zero_ptr) {
-    cout << "Field end not found!" << endl;
-    return -1;
-  }
-
-  // 解码int
-  int decoded = zero_ptr - ptr + 1;
-  value = atoi(ptr);
-  return decoded;
-}
-
-template<class T>
-const char* Decoder<T>::FindZero(char*& ptr, int size) {
-  return static_cast<const char*>(memchr(ptr, 0, size));
-}
-
 } // namespace tws_shell
 
-#endif//TWS_SHELL_ENCODER_H_
+#endif//TWS_SHELL_DECODER_H_

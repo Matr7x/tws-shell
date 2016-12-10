@@ -9,10 +9,10 @@ namespace tws_shell {
 
 // Declaration
 
-template<class T>
 class Encoder {
 
 public:
+  template<class T>
   static void Encode(std::ostream& os, T value);
 
 private:
@@ -22,25 +22,10 @@ private:
 
 // Implementation
 
-template<class T>
-const char Encoder<T>::kZero = '\0';
-
 // 通用编码函数
 template<class T>
-void Encoder<T>::Encode(std::ostream& os, T value) {
+void Encoder::Encode(std::ostream& os, T value) {
   os << value << kZero;
-}
-
-// bool编码
-template<>
-void Encoder<bool>::Encode(std::ostream& os, bool value) {
-  Encoder<int>::Encode(os, value ? 1 : 0);
-}
-
-// double编码
-template<>
-void Encoder<double>::Encode(std::ostream& os, double value) {
-  os << std::setprecision(8) << value << kZero;
 }
 
 } // namespace tws_shell

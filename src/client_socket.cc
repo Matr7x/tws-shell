@@ -57,32 +57,32 @@ int ClientSocket::Start() {
   
   // Begin Req Contract Detail
   
-  //Contract c;
-  //c.symbol = "UVXY";
-  //c.sec_type = "STK";
-  //c.exchange = "SMART";
-  //c.currency = "USD";
+  Contract c;
+  c.symbol = "UVXY";
+  c.sec_type = "STK";
+  c.exchange = "SMART";
+  c.currency = "USD";
 
-  //int ticker_id = 1;
-  //string end_date_time = "20161210 00:00:00 EST";
-  //string duration = "1 D";
-  //string bar_size = "30 secs";
-  //string what_to_show = "TRADES";
-  //int use_rth = 0;
-  //int format_date = 2;
+  int ticker_id = 1;
+  string end_date_time = "20161210 00:00:00 EST";
+  string duration = "1800 S";
+  string bar_size = "1 secs";
+  string what_to_show = "TRADES";
+  int use_rth = 0;
+  int format_date = 2;
 
-  //ostringstream oss; 
-  //MessageBuilder::BuildMsgReqHistoricalData(oss, ticker_id, c, end_date_time, duration, bar_size, what_to_show, use_rth, format_date);
-  //::send(sock_, oss.str().c_str(), oss.str().size(), 0);
+  ostringstream oss; 
+  MessageBuilder::BuildMsgReqHistoricalData(oss, ticker_id, c, end_date_time, duration, bar_size, what_to_show, use_rth, format_date);
+  ::send(sock_, oss.str().c_str(), oss.str().size(), 0);
 
   //ostringstream oss; 
   //MessageBuilder::BuildMsgReqMktData(oss, 0, c, "", false);
 
-  ostringstream oss; 
+  //ostringstream oss; 
   //MessageBuilder::BuildMsgReqAccountSummary(oss, 0, "All", 
       //"AccountType,NetLiquidation,TotalCashValue,SettledCash,AccruedCash,BuyingPower,EquityWithLoanValue,PreviousDayEquityWithLoanValue,GrossPositionValue,RegTEquity,RegTMargin,SMA,InitMarginReq,MaintMarginReq,AvailableFunds,ExcessLiquidity,Cushion,FullInitMarginReq,FullMaintMarginReq,FullAvailableFunds,FullExcessLiquidity,LookAheadNextChange,LookAheadInitMarginReq,LookAheadMaintMarginReq,LookAheadAvailableFunds,LookAheadExcessLiquidity,HighestSeverity,DayTradesRemaining,Leverage");
-  MessageBuilder::BuildMsgReqPositions(oss);
-  ::send(sock_, oss.str().c_str(), oss.str().size(), 0);
+  //MessageBuilder::BuildMsgReqPositions(oss);
+  //::send(sock_, oss.str().c_str(), oss.str().size(), 0);
   
   // End ReqConstract Detail
 

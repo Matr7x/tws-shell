@@ -8,15 +8,22 @@ namespace tws_shell {
 class Shell {
 
 public:
-  Shell(ClientSocket* client_socket) : client_socket_(client_socket) {};
+  Shell(ClientSocket* client_socket);
 
 public:
+  Shell();
   // 启动Shell
   int Run();
+
+  // 启动股价Watch
+  int RequestWatch();
 
 private:
   // 循环处理IO
   int ProcessIO();
+
+  // 通过Symbol进行Request
+  int RequestWatchBySymbol(string symbol);
 
 private:
   ClientSocket* client_socket_;

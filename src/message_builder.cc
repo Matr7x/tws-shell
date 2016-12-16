@@ -103,4 +103,19 @@ void MessageBuilder::BuildMsgReqHistoricalData(ostringstream& oss, long ticker_i
   ENCODE("");
 }
 
+void MessageBuilder::BuildMsgReqMarketDataType(ostringstream& oss, int market_data_type) {
+  const int kVersion = 1;
+  ENCODE(kMsgIdReqMarketDataType);
+  ENCODE(kVersion);
+  ENCODE(market_data_type);
+}
+
+void MessageBuilder::BuildMsgReqAccountUpdates(ostringstream& oss, bool subscribe, string acct_code) {
+  const int kVersion = 2;
+  ENCODE(kMsgIdReqAccountUpdates);
+  ENCODE(kVersion);
+  ENCODE(subscribe);
+  ENCODE(acct_code);
+}
+
 } // namespace tws_shell

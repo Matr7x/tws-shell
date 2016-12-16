@@ -11,13 +11,12 @@
 #include <assert.h>
 
 #include "message_builder.h"
-#include "message_processor.h"
 #include "decoder.h"
 #include "defines.h"
 
 using std::cout;
 using std::endl;
-using std::ostringstream;
+
 
 namespace tws_shell {
 
@@ -57,26 +56,31 @@ int ClientSocket::Start() {
   
   // Begin Req Contract Detail
   
-  Contract c;
-  c.symbol = "UVXY";
-  c.sec_type = "STK";
-  c.exchange = "SMART";
-  c.currency = "USD";
+  //Contract c;
+  //c.symbol = "UVXY";
+  //c.sec_type = "STK";
+  //c.exchange = "SMART";
+  //c.currency = "USD";
 
-  int ticker_id = 1;
-  string end_date_time = "20161210 00:00:00 EST";
-  string duration = "1800 S";
-  string bar_size = "1 secs";
-  string what_to_show = "TRADES";
-  int use_rth = 0;
-  int format_date = 2;
+  //int ticker_id = 1;
+  //string end_date_time = "20161210 00:00:00 EST";
+  //string duration = "1800 S";
+  //string bar_size = "1 secs";
+  //string what_to_show = "TRADES";
+  //int use_rth = 0;
+  //int format_date = 2;
 
-  ostringstream oss; 
-  MessageBuilder::BuildMsgReqHistoricalData(oss, ticker_id, c, end_date_time, duration, bar_size, what_to_show, use_rth, format_date);
-  ::send(sock_, oss.str().c_str(), oss.str().size(), 0);
+  //ostringstream oss; 
+  //MessageBuilder::BuildMsgReqHistoricalData(oss, ticker_id, c, end_date_time, duration, bar_size, what_to_show, use_rth, format_date);
+  //::send(sock_, oss.str().c_str(), oss.str().size(), 0);
+
+  //ostringstream oss2;
+  //MessageBuilder::BuildMsgReqMarketDataType(oss2, 2);
+  //::send(sock_, oss2.str().c_str(), oss2.str().size(), 0);
 
   //ostringstream oss; 
   //MessageBuilder::BuildMsgReqMktData(oss, 0, c, "", false);
+  //::send(sock_, oss.str().c_str(), oss.str().size(), 0);
 
   //ostringstream oss; 
   //MessageBuilder::BuildMsgReqAccountSummary(oss, 0, "All", 
@@ -85,6 +89,10 @@ int ClientSocket::Start() {
   //::send(sock_, oss.str().c_str(), oss.str().size(), 0);
   
   // End ReqConstract Detail
+
+  //ostringstream oss2;
+  //MessageBuilder::BuildMsgReqAccountUpdates(oss2, true, "");
+  //::send(sock_, oss2.str().c_str(), oss2.str().size(), 0);
 
   return 0;
 }
@@ -130,9 +138,15 @@ int ClientSocket::Select() {
   return 0;
 }
 
+int ClientSocket::Send(ostringstream& oss) {
+  // TODO: 判断是否成功
+  ::send(sock_, oss.str().c_str(), oss.str().size(), 0);
+  return 0;
+}
+
 int ClientSocket::Receive() {
   // XXX: 接收代码待优化
-  char buf[8192];
+  char buf[65536];
   int received = 0;
   do {
     // FIXME: 当buffer填满时会存在边界bug
@@ -154,7 +168,7 @@ int ClientSocket::Receive() {
       exit(255);
     }
 
-    cout << "Received: " << received << endl;
+    //cout << "Received: " << received << endl;
 
     int processed = 0;
 
@@ -171,110 +185,24 @@ int ClientSocket::Receive() {
       processed += decoded;
 
       switch(msg_id) {
-        case MANAGED_ACCTS: {
-          int c = MessageProcessor::ProcessManagedAccts(&buf[processed], received - processed);
-          if (c < 0) {
-            return 255;
-          }
-          processed += c;
-          break;
-        }
-        case NEXT_VALID_ID: {
-          int c = MessageProcessor::ProcessNextValidId(&buf[processed], received - processed);
-          if (c < 0) {
-            return 255;
-          }
-          processed += c;
-          break;
-        }
-        case ERR_MSG: {
-          int c = MessageProcessor::ProcessErrMsg(&buf[processed], received - processed);
-          if (c < 0) {
-            return 255;
-          }
-          processed += c;
-          break;
-        }
-        case CONTRACT_DATA: {
-          int c = MessageProcessor::ProcessContractData(&buf[processed], received - processed);
-          if (c < 0) {
-            return 255;
-          }
-          processed += c;
-          break;
-        }
-        case CONTRACT_DATA_END: {
-          int c = MessageProcessor::ProcessContractDataEnd(&buf[processed], received - processed);
-          if (c < 0) {
-            return 255;
-          }
-          processed += c;
-          break;
-        }
-        case TICK_STRING: {
-          int c = MessageProcessor::ProcessTickString(&buf[processed], received - processed);
-          if (c < 0) {
-            return 255;
-          }
-          processed += c;
-          break;
-        }
-        case TICK_PRICE: {
-          int c = MessageProcessor::ProcessTickPrice(&buf[processed], received - processed);
-          if (c < 0) {
-            return 255;
-          }
-          processed += c;
-          break;
-        }
-        case TICK_SIZE: {
-          int c = MessageProcessor::ProcessTickSize(&buf[processed], received - processed);
-          if (c < 0) {
-            return 255;
-          }
-          processed += c;
-          break;
-        }
-        case ACCOUNT_SUMMARY: {
-          int c = MessageProcessor::ProcessAccountSummary(&buf[processed], received - processed);
-          if (c < 0) {
-            return 255;
-          }
-          processed += c;
-          break;
-        }
-        case ACCOUNT_SUMMARY_END: {
-          int c = MessageProcessor::ProcessAccountSummaryEnd(&buf[processed], received - processed);
-          if (c < 0) {
-            return 255;
-          }
-          processed += c;
-          break;
-        }
-        case POSITION_DATA: {
-          int c = MessageProcessor::ProcessPositionData(&buf[processed], received - processed);
-          if (c < 0) {
-            return 255;
-          }
-          processed += c;
-          break;
-        }
-        case POSITION_END: {
-          int c = MessageProcessor::ProcessPositionEnd(&buf[processed], received - processed);
-          if (c < 0) {
-            return 255;
-          }
-          processed += c;
-          break;
-        }
-        case HISTORICAL_DATA: {
-          int c = MessageProcessor::ProcessHistoricalData(&buf[processed], received - processed);
-          if (c < 0) {
-            return 255;
-          }
-          processed += c;
-          break;
-        }
+        PROCESS(MANAGED_ACCTS, message_processor_->ProcessManagedAccts);
+        PROCESS(NEXT_VALID_ID, message_processor_->ProcessNextValidId);
+        PROCESS(ERR_MSG, message_processor_->ProcessErrMsg);
+        PROCESS(CONTRACT_DATA, message_processor_->ProcessContractData);
+        PROCESS(CONTRACT_DATA_END, message_processor_->ProcessContractDataEnd);
+        PROCESS(TICK_STRING, message_processor_->ProcessTickString);
+        PROCESS(TICK_PRICE, message_processor_->ProcessTickPrice);
+        PROCESS(TICK_SIZE, message_processor_->ProcessTickSize);
+        PROCESS(ACCOUNT_SUMMARY, message_processor_->ProcessAccountSummary);
+        PROCESS(ACCOUNT_SUMMARY_END, message_processor_->ProcessAccountSummaryEnd);
+        PROCESS(POSITION_DATA, message_processor_->ProcessPositionData);
+        PROCESS(POSITION_END, message_processor_->ProcessPositionEnd);
+        PROCESS(HISTORICAL_DATA, message_processor_->ProcessHistoricalData);
+        PROCESS(ACCT_VALUE, message_processor_->ProcessAcctValue);
+        PROCESS(ACCT_UPDATE_TIME, message_processor_->ProcessAcctUpdateTime);
+        PROCESS(PORTFOLIO_VALUE, message_processor_->ProcessPortfolioValue);
+        PROCESS(ACCT_DOWNLOAD_END, message_processor_->ProcessAcctDownloadEnd);
+        PROCESS(TICK_GENERIC, message_processor_->ProcessTickGeneric);
         default: {
           cout << "Unknow message id: " << msg_id << endl;
           exit(255);
@@ -330,7 +258,7 @@ int ClientSocket::ProcessConnectionResponse() {
     return 255;
   }
 
-  cout << "Received :" << size << endl;
+  //cout << "Received :" << size << endl;
 
   int processed = 0;
   int decoded = 0;
@@ -343,12 +271,12 @@ int ClientSocket::ProcessConnectionResponse() {
 
   assert(processed == size);
 
-  cout << endl;
-  cout << "[Begin] ### Server Info ###" << endl;
-  cout << "Server Version: " << version << endl;
-  cout << "TWS Time: " << tws_time << endl;
-  cout << "[End] ### Server Info ###" << endl;
-  cout << endl;
+  //cout << endl;
+  //cout << "[Begin] ### Server Info ###" << endl;
+  //cout << "Server Version: " << version << endl;
+  //cout << "TWS Time: " << tws_time << endl;
+  //cout << "[End] ### Server Info ###" << endl;
+  //cout << endl;
 
   return 0;
 }

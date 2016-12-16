@@ -9,9 +9,6 @@
 namespace tws_shell {
 
 int MessageProcessor::ProcessManagedAccts(char* buf, int size) {
-  cout << endl;
-  cout << "[Begin] ### Process Managed Accts ###" << endl;
-
   int processed = 0;
   int decoded = 0;
 
@@ -21,17 +18,12 @@ int MessageProcessor::ProcessManagedAccts(char* buf, int size) {
   DECODE(version);
   DECODE(account_list);
 
-  cout << "Version: " << version << endl;
-  cout << "Account List: " << account_list << endl;
+  wrapper_->OnEventManagedAccounts(account_list);
 
-  cout << "[End] ### Process Managed Accts ###" << endl << endl;
   return processed;
 }
 
 int MessageProcessor::ProcessNextValidId(char* buf, int size) {
-  cout << endl;
-  cout << "[Begin] ### Process Next Valid Id ###" << endl;
-
   int processed = 0;
   int decoded = 0;
 
@@ -41,16 +33,14 @@ int MessageProcessor::ProcessNextValidId(char* buf, int size) {
   DECODE(version);
   DECODE(order_id);
 
-  cout << "Version: " << version << endl;
-  cout << "Next Order Id: " << order_id << endl;
+  wrapper_->OnEventNextValidId(order_id);
 
-  cout << "[End] ### Process Next Valid Id ###" << endl << endl;
   return processed;
 }
 
 int MessageProcessor::ProcessErrMsg(char* buf, int size) {
-  cout << endl;
-  cout << "[Begin] ### Process Error Msg ###" << endl;
+  //cout << endl;
+  //cout << "[Begin] ### Process Error Msg ###" << endl;
 
   int processed = 0;
   int decoded = 0;
@@ -65,12 +55,12 @@ int MessageProcessor::ProcessErrMsg(char* buf, int size) {
   DECODE(err_code);
   DECODE(err_msg);
 
-  cout << "Version: " << version << endl;
-  cout << "Id: " << id << endl;
-  cout << "Error Code: " << err_code << endl;
-  cout << "Error Msg: " << err_msg << endl;
+  //cout << "Version: " << version << endl;
+  //cout << "Id: " << id << endl;
+  //cout << "Error Code: " << err_code << endl;
+  //cout << "Error Msg: " << err_msg << endl;
 
-  cout << "[End] ### Process Error Msg ###" << endl << endl;
+  //cout << "[End] ### Process Error Msg ###" << endl << endl;
   return processed;
 }
 
@@ -216,9 +206,6 @@ int MessageProcessor::ProcessContractDataEnd(char* buf, int size) {
 }
 
 int MessageProcessor::ProcessTickString(char* buf, int size) {
-  cout << endl;
-  cout << "[Begin] ### Process Tick String ###" << endl;
-
   int processed = 0;
   int decoded = 0;
 
@@ -232,19 +219,11 @@ int MessageProcessor::ProcessTickString(char* buf, int size) {
   DECODE(ticker_type_int);
   DECODE(value);
 
-  cout << "Version: " << version << endl;
-  cout << "Ticker id: " << ticker_id << endl;
-  cout << "Ticker type int: " << ticker_type_int << endl;
-  cout << "Value: " << value << endl;
-
-  cout << "[End] ### Process Tick String ###" << endl << endl;
+  wrapper_->OnEventTickString(ticker_id, ticker_type_int, value);
   return processed;
 }
 
 int MessageProcessor::ProcessTickPrice(char* buf, int size) {
-  cout << endl;
-  cout << "[Begin] ### Process Tick Price ###" << endl;
-
   int processed = 0;
   int decoded = 0;
 
@@ -262,40 +241,43 @@ int MessageProcessor::ProcessTickPrice(char* buf, int size) {
   DECODE(size2);
   DECODE(can_auto_execute);
 
-  cout << "Version: " << version << endl;
-  cout << "Ticker id: " << ticker_id << endl;
-  cout << "Ticker type int: " << ticker_type_int << endl;
-  cout << "Price: " << price << endl;
-  cout << "Size: " << size2 << endl;
-  cout << "Can auto execute: " << can_auto_execute<< endl;
+  wrapper_->OnEventTickPrice(ticker_id, ticker_type_int, price, can_auto_execute);
 
-  cout << "[End] ### Process Tick Price ###" << endl << endl;
+  int tick_size_type = -1;
+  switch(ticker_type_int) {
+    case 1:
+      tick_size_type = 0;
+      break;
+    case 2:
+      tick_size_type = 3;
+      break;
+    case 4:
+      tick_size_type = 5;
+      break;
+  }
+
+  if (-1 != tick_size_type) {
+    wrapper_->OnEventTickSize(ticker_id, tick_size_type, size2);
+  }
+
   return processed;
 }
 
 int MessageProcessor::ProcessTickSize(char* buf, int size) {
-  cout << endl;
-  cout << "[Begin] ### Process Tick Size ###" << endl;
-
   int processed = 0;
   int decoded = 0;
 
   int version = 0;
   long ticker_id;
   int ticker_type_int;
-  string size2;
+  int size2;
 
   DECODE(version);
   DECODE(ticker_id);
   DECODE(ticker_type_int);
   DECODE(size2);
-  
-  cout << "Version: " << version << endl;
-  cout << "Ticker id: " << ticker_id << endl;
-  cout << "Ticker type int: " << ticker_type_int << endl;
-  cout << "Size: " << size2 << endl;
 
-  cout << "[End] ### Process Tick Size ###" << endl << endl;
+  wrapper_->OnEventTickSize(ticker_id, ticker_type_int, size2);
   return processed;
 }
 
@@ -445,6 +427,158 @@ int MessageProcessor::ProcessHistoricalData(char* buf, int size) {
   //cout << "End Date: " << end_date << endl;
 
   cout << "[End] ### Process Historical Data ###" << endl << endl;
+  return processed;
+}
+
+int MessageProcessor::ProcessAcctValue(char* buf, int size) {
+  cout << endl;
+  cout << "[Begin] ### Process Acct Value ###" << endl;
+
+  int processed = 0;
+  int decoded = 0;
+
+  int version = 0;
+  string key;
+  string val;
+  string cur;
+  string account_name;
+
+  DECODE(version);
+  DECODE(key);
+  DECODE(val);
+  DECODE(cur);
+  DECODE(account_name);
+
+  cout << "Version: " << version << endl;
+  cout << "Key: " << key << endl;
+  cout << "Val: " << val << endl;
+  cout << "Cur: " << cur << endl;
+  cout << "Account Name: " << account_name << endl;
+
+  cout << "[End] ### Process Acct Value ###" << endl << endl;
+  return processed;
+}
+
+int MessageProcessor::ProcessAcctUpdateTime(char* buf, int size) {
+  cout << endl;
+  cout << "[Begin] ### Process Acct Update Time ###" << endl;
+
+  int processed = 0;
+  int decoded = 0;
+
+  int version = 0;
+  string account_time;
+
+  DECODE(version);
+  DECODE(account_time);
+
+  cout << "Version: " << version << endl;
+  cout << "Account Time: " << account_time << endl;
+
+  cout << "[End] ### Process Acct Update Time ###" << endl << endl;
+  return processed;
+}
+
+int MessageProcessor::ProcessPortfolioValue(char* buf, int size) {
+  cout << endl;
+  cout << "[Begin] ### Process Potrfolio Value ###" << endl;
+
+  int processed = 0;
+  int decoded = 0;
+
+  int version = 0;
+  Contract contract;
+
+  DECODE(version);
+  DECODE(contract.con_id);
+  DECODE(contract.symbol);
+  DECODE(contract.sec_type);
+  DECODE(contract.expiry);
+  DECODE(contract.strike);
+  DECODE(contract.right);
+
+  if (version >= 7) {
+    DECODE(contract.multiplier);
+    DECODE(contract.primary_exchange);
+  }
+
+  DECODE(contract.currency);
+  DECODE(contract.local_symbol);
+
+  if (version >= 8) {
+    DECODE(contract.trading_class);
+  }
+
+  int position;
+  double market_price;
+  double market_value;
+  double average_cost;
+  double unrealized_pnl;
+  double realized_pnl;
+
+  DECODE(position);
+  DECODE(market_price);
+  DECODE(market_value);
+  DECODE(average_cost);
+  DECODE(unrealized_pnl);
+  DECODE(realized_pnl);
+
+  string account_name;
+  DECODE(account_name);
+
+  // TODO: version 6 and server version 39
+  
+  cout << "Version: " << version << endl;
+  cout << "Symbol: " << contract.symbol << endl;
+  cout << "Position: " << position << endl;
+
+  cout << "[End] ### Process Protfolio Value ###" << endl << endl;
+  return processed;
+}
+
+int MessageProcessor::ProcessAcctDownloadEnd(char* buf, int size) {
+  cout << endl;
+  cout << "[Begin] ### Process Acct Download End ###" << endl;
+
+  int processed = 0;
+  int decoded = 0;
+
+  int version = 0;
+  string account;
+
+  DECODE(version);
+  DECODE(account);
+
+  cout << "Version: " << version << endl;
+  cout << "Account: " << account << endl;
+
+  cout << "[End] ### Process Acct Download End ###" << endl << endl;
+  return processed;
+}
+
+int MessageProcessor::ProcessTickGeneric(char* buf, int size) {
+  //cout << endl;
+  //cout << "[Begin] ### Process Tick Generic ###" << endl;
+
+  int processed = 0;
+  int decoded = 0;
+
+  int version = 0;
+  int ticker_id;
+  int tick_type_int;
+  double value;
+
+  DECODE(version);
+  DECODE(ticker_id);
+  DECODE(tick_type_int);
+  DECODE(value);
+
+  //cout << "Version: " << version << endl;
+  //cout << "Ticker id: " << ticker_id << endl;
+  //cout << "Tick type int: " << tick_type_int << endl;
+  //cout << "Value: " << value << endl;
+
+  //cout << "[End] ### Process Tick Generic ###" << endl << endl;
   return processed;
 }
 

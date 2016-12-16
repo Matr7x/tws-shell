@@ -11,6 +11,8 @@ const int   kMsgIdReqMktData              = 1;
 const int   kMsgIdReqAccountSummary       = 62;
 const int   kMsgIdReqPositions            = 61;
 const int   kMsgIdReqHistoricalData       = 20;
+const int   kMsgIdReqMarketDataType       = 59;
+const int   kMsgIdReqAccountUpdates       = 6;
 
 // INCOMMING MSG ID
 const int TICK_PRICE                = 1;
@@ -66,5 +68,15 @@ const int DISPLAY_GROUP_UPDATED     = 68;
 
 #define ENCODE(x) \
   Encoder::Encode(oss, x);
+
+#define PROCESS(msg_id, process) \
+  case msg_id: { \
+    int c = process(&buf[processed], received - processed); \
+    if (c < 0) { \
+      return 255; \
+    } \
+    processed += c; \
+    break; \
+  }
 
 #endif //TWS_DEFINES_SOCKET_H_

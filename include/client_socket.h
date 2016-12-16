@@ -2,16 +2,20 @@
 #define TWS_SHELL_CLIENT_SOCKET_H_
 
 #include <string>
+#include <sstream>
+
+#include "message_processor.h"
 
 using std::string;
+using std::ostringstream;
 
 namespace tws_shell {
 
 class ClientSocket {
 
 public:
-  ClientSocket(string address, int port) : 
-    address_(address), port_(port), sock_(-1) {}
+  ClientSocket(MessageProcessor* message_processor, string address, int port) : 
+    message_processor_(message_processor), address_(address), port_(port), sock_(-1) {}
 
 public:
   // 启动ClientSocket
@@ -22,6 +26,9 @@ public:
 
   // Select
   int Select();
+
+  // Send
+  int Send(ostringstream& oss);
 
 private:
   // 连接服务器
@@ -52,6 +59,8 @@ private:
   int DecodeMessage();
 
 private:
+  MessageProcessor* message_processor_;
+
   string  address_;
   int     port_;
   int     sock_;

@@ -8,6 +8,8 @@ using std::string;
 namespace tws_shell {
 
 struct Contract {
+  static Contract CreateStock(string symbol);
+
   Contract() : con_id(0), strike(0.0), include_expired(false) {}
 
   long con_id;
